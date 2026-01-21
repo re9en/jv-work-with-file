@@ -15,7 +15,7 @@ public class WorkWithFile {
     private static final String RESULT_CONST = "result";
 
     public void getStatistic(String fromFileName, String toFileName) {
-        writeToFile(toFileName, readFileName(fromFileName));
+        writeToFile(toFileName, fromFileName);
     }
 
     private int[] readFileName(String fromFileName) {
@@ -38,22 +38,28 @@ public class WorkWithFile {
         return new int[]{supply, buy};
     }
 
-    private void writeToFile(String toFileName, int[] counters) {
-
-        StringBuilder fileNameData = new StringBuilder();
-
+    private void writeToFile(String toFileName, String fromFileName) {
         try (BufferedWriter writer =
                      Files.newBufferedWriter(Path.of(toFileName))) {
-            fileNameData.append(SUPPLY_CONST + "," + counters[FIRST_PART]
-                            + System.lineSeparator())
-                    .append(BUY_CONST + "," + counters[SECOND_PART]
-                            + System.lineSeparator())
-                    .append(RESULT_CONST + "," + (counters[FIRST_PART] - counters[SECOND_PART])
-                            + System.lineSeparator());
-            writer.write(String.valueOf(fileNameData));
+            writer.write(createReport(readFileName(fromFileName)));
         } catch (IOException e) {
             throw new RuntimeException("CAN'T WRITE TO FILE: " + e);
         }
+    }
 
+    private String createReport(int[] counters) {
+        StringBuilder fileNameData = new StringBuilder();
+        return String.valueOf(fileNameData.append(SUPPLY_CONST)
+                .append(",")
+                .append(counters[FIRST_PART])
+                .append(System.lineSeparator())
+                .append(BUY_CONST)
+                .append(",")
+                .append(counters[SECOND_PART])
+                .append(System.lineSeparator())
+                .append(RESULT_CONST)
+                .append(",")
+                .append((counters[FIRST_PART] - counters[SECOND_PART]))
+                .append(System.lineSeparator()));
     }
 }

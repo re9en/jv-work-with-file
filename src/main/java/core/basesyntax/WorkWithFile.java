@@ -10,25 +10,23 @@ public class WorkWithFile {
 
     private static final int FIRST_PART = 0;
     private static final int SECOND_PART = 1;
-    private int supply = 0;
-    private int buy = 0;
+    private static final String SUPPLY_CONST = "supply";
+    private static final String BUY_CONST = "buy";
+    private static final String RESULT_CONST = "result";
 
     public void getStatistic(String fromFileName, String toFileName) {
-        supply = 0;
-        buy = 0;
-        readFileName(fromFileName);
-        writeToFile(toFileName);
+        writeToFile(toFileName, readFileName(fromFileName));
     }
 
-    public void readFileName(String fromFileName) {
-
-        String[] parts = new String[2];
+    private int[] readFileName(String fromFileName) {
+        int supply = 0;
+        int buy = 0;
         try (BufferedReader reader =
                     Files.newBufferedReader(Path.of(fromFileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                parts = line.split(",");
-                if (parts[FIRST_PART].equals("supply")) {
+                String[] parts = line.split(",");
+                if (parts[FIRST_PART].equals(SUPPLY_CONST)) {
                     supply += Integer.parseInt(parts[SECOND_PART]);
                 } else {
                     buy += Integer.parseInt(parts[SECOND_PART]);
@@ -37,20 +35,24 @@ public class WorkWithFile {
         } catch (IOException e) {
             throw new RuntimeException("CAN'T READ FILE: " + e);
         }
+        return new int[]{supply, buy};
     }
 
-    public void writeToFile(String toFileName) {
+    private void writeToFile(String toFileName, int[] counters) {
 
         StringBuilder fileNameData = new StringBuilder();
 
         try (BufferedWriter writer =
                      Files.newBufferedWriter(Path.of(toFileName))) {
-            fileNameData.append("supply," + supply + System.lineSeparator())
-                    .append("buy," + buy + System.lineSeparator())
-                    .append("result," + (supply - buy) + System.lineSeparator());
+            fileNameData.append(SUPPLY_CONST + "," + counters[FIRST_PART]
+                            + System.lineSeparator())
+                    .append(BUY_CONST + "," + counters[SECOND_PART]
+                            + System.lineSeparator())
+                    .append(RESULT_CONST + "," + (counters[FIRST_PART] - counters[SECOND_PART])
+                            + System.lineSeparator());
             writer.write(String.valueOf(fileNameData));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("CAN'T WRITE TO FILE: " + e);
         }
 
     }
